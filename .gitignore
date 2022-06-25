@@ -1,0 +1,4 @@
+.vagrant
+ubuntu-bionic-18.04-cloudimg-console.log
+k3s/envoy-contour
+k3s/sample
