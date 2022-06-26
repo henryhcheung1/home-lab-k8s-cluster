@@ -1,8 +1,4 @@
-#!/bin/sh
-
-# TODO:
-# - Move /tmp/token to a different directory
- 
+#!/bin/sh 
 
 # Deploy keys to allow all nodes to connect each others as root
 mv /tmp/id_rsa*  /root/.ssh/
@@ -27,5 +23,7 @@ master_lb_ip="192.168.1.32"
 
 # Launch k3s as agent
 scp -o StrictHostKeyChecking=no root@kubemaster1:/var/lib/rancher/k3s/server/token /tmp/token
-# curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://kubemaster1:6443 --token-file /tmp/token --node-ip=${current_ip}" sh -
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://${master_lb_ip}:6443 --token-file /tmp/token --node-ip=${current_ip}" sh -
+
+# Mount eBPF Filesystem for cilium
+sudo mount bpffs -t bpf /sys/fs/bpf
