@@ -21,11 +21,11 @@ master_lb_ip="192.168.1.32"
 # If we are on first node, launch k3s with cluster-init, else we join the existing cluster
 if [ $(hostname) = "kubemaster1" ]
 then
-    curl -sfL https://get.k3s.io | sh -s - server --cluster-init --tls-san ${master_lb_ip} --tls-san ${hostname} --bind-address=${current_ip} --advertise-address=${current_ip} --node-ip=${current_ip} --node-taint CriticalAddonsOnly=true:NoExecute --disable servicelb --flannel-backend=none # --disable traefik
+    curl -sfL https://get.k3s.io | sh -s - server --cluster-init --tls-san ${master_lb_ip} --tls-san ${hostname} --bind-address=${current_ip} --advertise-address=${current_ip} --node-ip=${current_ip} --node-taint CriticalAddonsOnly=true:NoExecute --disable servicelb --flannel-backend=none --disable-network-policy # --disable traefik
 else
     echo "10.0.0.11  kubemaster1" >> /etc/hosts
     scp -o StrictHostKeyChecking=no root@kubemaster1:/var/lib/rancher/k3s/server/token /tmp/token
-    curl -sfL https://get.k3s.io | sh -s - server --server https://${master_lb_ip}:6443 --token-file /tmp/token --tls-san ${master_lb_ip} --tls-san ${hostname} --bind-address=${current_ip} --advertise-address=${current_ip} --node-ip=${current_ip} --node-taint CriticalAddonsOnly=true:NoExecute --disable servicelb --flannel-backend=none # --disable traefik
+    curl -sfL https://get.k3s.io | sh -s - server --server https://${master_lb_ip}:6443 --token-file /tmp/token --tls-san ${master_lb_ip} --tls-san ${hostname} --bind-address=${current_ip} --advertise-address=${current_ip} --node-ip=${current_ip} --node-taint CriticalAddonsOnly=true:NoExecute --disable servicelb --flannel-backend=none --disable-network-policy # --disable traefik
 fi
 
 # Mount eBPF Filesystem for cilium
