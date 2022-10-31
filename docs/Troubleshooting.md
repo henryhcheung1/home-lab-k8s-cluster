@@ -20,3 +20,11 @@ scp -o StrictHostKeyChecking=no root@kubemaster1:/var/lib/rancher/k3s/server/tok
 # check node status
 ```
 
+
+### debug vagrant timeout
+```bash
+
+# start vagrant GUI
+https://stackoverflow.com/questions/22575261/vagrant-stuck-connection-timeout-retrying
+
+```

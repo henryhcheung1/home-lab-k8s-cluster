@@ -1,42 +1,34 @@
-MASTER_COUNT = 1
-NODE_COUNT = 1
-IMAGE = "ubuntu/bionic64"
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
+#The cluster will start with 2 agent nodes by default. You can tune the
+#number of agent nodes by passing an enviornment variable for K3S_AGENTS
+
+number_of_agents = (ENV['K3S_AGENTS'] || "1").to_i
+box_name = (ENV['VAGRANT_BOX'] || "ubuntu/focal64")
 Vagrant.configure("2") do |config|
+  config.vm.box = "#{box_name}"
 
-    # frontend haproxy load balancer to k8s masters
-    config.vm.define "front_lb" do |haproxy|
-      haproxy.vm.box = IMAGE
-      haproxy.vm.hostname = "haproxy"
-      haproxy.vm.network  :private_network, ip: "10.0.0.30"   
-      haproxy.vm.network :public_network, bridge: "wlo1", ip: "192.168.1.32"
-      haproxy.vm.network "forwarded_port", guest: 6443, host: 6443
-      haproxy.vm.provision "file", source: "scripts/haproxy/haproxy.cfg", destination: "/tmp/haproxy.cfg"
-      haproxy.vm.provision "shell", privileged: true,  path: "scripts/haproxy/install_happroxy.sh"
-    end
-  
-  # masters
-  (1..MASTER_COUNT).each do |i|
-    config.vm.define "kubemaster#{i}" do |kubemasters|
-      kubemasters.vm.box = IMAGE
-      kubemasters.vm.hostname = "kubemaster#{i}"
-      kubemasters.vm.network  :private_network, ip: "10.0.0.#{i+10}"
-      kubemasters.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/tmp/id_rsa.pub"
-      kubemasters.vm.provision "file", source: "~/.ssh/id_rsa", destination: "/tmp/id_rsa"
-      kubemasters.vm.provision "shell", privileged: true,  path: "scripts/master_install.sh"
+  config.vm.define "master" do |master|
+    master.vm.hostname = 'master'
+    master.vm.network :private_network, ip: "192.168.80.10", :netmask => "255.255.255.0"
+    master.vm.provision :shell, :path => "scripts/master.sh"
+    master.vm.provider :virtualbox do |vbox|
+        vbox.customize ["modifyvm", :id, "--memory", 2048]
+        vbox.customize ["modifyvm", :id, "--cpus", 1]
     end
   end
 
-  # workers
-  (1..NODE_COUNT).each do |i|
-    config.vm.define "kubenode#{i}" do |kubenodes|
-      kubenodes.vm.box = IMAGE
-      kubenodes.vm.hostname = "kubenode#{i}"
-      kubenodes.vm.network  :private_network, ip: "10.0.0.#{i+20}"
-      kubenodes.vm.network :public_network, bridge: "wlo1", ip: "192.168.1.#{i+20}"
-      kubenodes.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/tmp/id_rsa.pub"
-      kubenodes.vm.provision "file", source: "~/.ssh/id_rsa", destination: "/tmp/id_rsa"
-      kubenodes.vm.provision "shell", privileged: true,  path: "scripts/node_install.sh"
+  (1..number_of_agents).each do |node_number|
+    config.vm.define "agent#{node_number}" do |agent|
+      agent.vm.hostname = "agent#{node_number}"
+      ip = node_number + 100
+      agent.vm.network :private_network, ip: "192.168.80.#{ip}", :netmask => "255.255.255.0"
+      agent.vm.provision :shell, :path => "scripts/agent.sh"
+      agent.vm.provider :virtualbox do |vbox|
+          vbox.customize ["modifyvm", :id, "--memory", 2048]
+          vbox.customize ["modifyvm", :id, "--cpus", 1]
+      end
     end
   end
 end
