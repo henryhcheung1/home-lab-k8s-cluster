@@ -14,6 +14,8 @@ Cluster Components:
 
 TODO:
 
-- Replace static IPs with DNS records
-- Need to fix node not ready after cluster restart 
+- Add add-node makefile target
+- Start k3s from a config file? (bringup VM, template config file to VM k3s location, start k3s)
 - Evaluate starting k3s with external DB or embedded DB
+
+

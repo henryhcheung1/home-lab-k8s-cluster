@@ -19,16 +19,16 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  (1..number_of_agents).each do |node_number|
-    config.vm.define "agent#{node_number}" do |agent|
-      agent.vm.hostname = "agent#{node_number}"
-      ip = node_number + 100
-      agent.vm.network :private_network, ip: "192.168.80.#{ip}", :netmask => "255.255.255.0"
-      agent.vm.provision :shell, :path => "scripts/agent.sh"
-      agent.vm.provider :virtualbox do |vbox|
-          vbox.customize ["modifyvm", :id, "--memory", 2048]
-          vbox.customize ["modifyvm", :id, "--cpus", 1]
-      end
-    end
-  end
+  # (1..number_of_agents).each do |node_number|
+  #   config.vm.define "agent#{node_number}" do |agent|
+  #     agent.vm.hostname = "agent#{node_number}"
+  #     ip = node_number + 100
+  #     agent.vm.network :private_network, ip: "192.168.80.#{ip}", :netmask => "255.255.255.0"
+  #     agent.vm.provision :shell, :path => "scripts/agent.sh"
+  #     agent.vm.provider :virtualbox do |vbox|
+  #         vbox.customize ["modifyvm", :id, "--memory", 2048]
+  #         vbox.customize ["modifyvm", :id, "--cpus", 1]
+  #     end
+  #   end
+  # end
 end
