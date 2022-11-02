@@ -1,0 +1,29 @@
+---
+- hosts: all
+  become: yes
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Copying scripts to remote
+      become: true 
+      copy:
+        src: scripts
+        dest: /home/vagrant/
+        mode: 0110
+
+    # - name: debug 1
+    #   shell:
+    #      "ls -l && whoami && sudo ls"
+    #   register: debug
+
+    # - name: debug 2
+    #   debug:
+    #     msg: "debug: {{ debug.stdout }}"
+
+    - name: Run master.sh
+      shell:
+         "./scripts/master.sh"
+
+    - name: Run install-cilium.sh
+      shell:
+         "./scripts/install-cilium.sh"

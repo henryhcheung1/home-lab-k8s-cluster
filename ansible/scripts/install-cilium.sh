@@ -13,4 +13,4 @@ then
     rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 fi
 
-KUBECONFIG="${LOCAL_DIR}/k3s.yaml" cilium install
+sudo KUBECONFIG="/etc/rancher/k3s/k3s.yaml" cilium install

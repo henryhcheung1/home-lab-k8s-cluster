@@ -12,11 +12,17 @@ Vagrant.configure("2") do |config|
   config.vm.define "master" do |master|
     master.vm.hostname = 'master'
     master.vm.network :private_network, ip: "192.168.80.10", :netmask => "255.255.255.0"
-    master.vm.provision :shell, :path => "scripts/master.sh"
+    # master.vm.provision :shell, :path => "scripts/master.sh"  
+    # master.vm.provision :shell, :path => "scripts/install_cilium.sh"  
     master.vm.provider :virtualbox do |vbox|
         vbox.customize ["modifyvm", :id, "--memory", 2048]
         vbox.customize ["modifyvm", :id, "--cpus", 1]
     end
+
+    config.vm.provision "ansible" do |ansible|
+      ansible.playbook = "ansible/master-playbook.yaml"
+    end
+  
   end
 
   # (1..number_of_agents).each do |node_number|
