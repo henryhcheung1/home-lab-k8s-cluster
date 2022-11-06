@@ -11,10 +11,6 @@
         dest: /home/vagrant/
         mode: 0110
 
-    - name: Run master.sh
+    - name: Run agent.sh
       shell:
-         "./scripts/master.sh"
-
-    - name: Run install-cilium.sh
-      shell:
-         "./scripts/install-cilium.sh"
+         "./scripts/agent.sh"

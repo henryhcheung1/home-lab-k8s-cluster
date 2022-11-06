@@ -27,4 +27,7 @@ scp -o StrictHostKeyChecking=no root@kubemaster1:/var/lib/rancher/k3s/server/tok
 # start vagrant GUI
 https://stackoverflow.com/questions/22575261/vagrant-stuck-connection-timeout-retrying
 
+# vagrant verbose
+VAGRANT_LOG=info vagrant up
+vagrant up --debug
 ```

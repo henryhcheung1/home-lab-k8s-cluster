@@ -8,8 +8,9 @@ Cluster Components:
 - Traefik ingress controller (or Envoy Contour)
 - Cilium CNI
 - Flatcar Linux
-- CSI (Ceph?)
+- CSI (Ceph?, Longhorn)
 - Open Policy Agent (OPA)
+- Istio
 
 
 TODO:
@@ -19,3 +20,4 @@ TODO:
 - Evaluate starting k3s with external DB or embedded DB
 
 
+- Add multiple master nodes support
