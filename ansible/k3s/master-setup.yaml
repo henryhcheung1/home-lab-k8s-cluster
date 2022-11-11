@@ -9,8 +9,12 @@
       copy:
         src: scripts
         dest: /home/vagrant/
-        mode: 0110
+        mode: 0550
 
-    - name: Run agent.sh
+    - name: Run master.sh
       shell:
-         "./scripts/agent.sh"
+         "./scripts/master.sh"
+
+    - name: Run install-cilium.sh
+      shell:
+         "./scripts/install-cilium.sh"

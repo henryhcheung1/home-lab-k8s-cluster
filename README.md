@@ -10,14 +10,19 @@ Cluster Components:
 - Flatcar Linux
 - CSI (Ceph?, Longhorn)
 - Open Policy Agent (OPA)
-- Istio
+- Service mesh (Istio?)
 
 
 TODO:
 
 - Add add-node makefile target
 - Start k3s from a config file? (bringup VM, template config file to VM k3s location, start k3s)
-- Evaluate starting k3s with external DB or embedded DB
-
-
+- Start k3s with external etcd (or [SQL db?](https://learnk8s.io/etcd-kubernetes#:~:text=of%20watch%20queries.-,Replacing%20etcd,-etcd%20works%20terrifically)) with mutual TLS
 - Add multiple master nodes support
+
+
+### Setup
+```
+mkdir local
+vagrant up
+```

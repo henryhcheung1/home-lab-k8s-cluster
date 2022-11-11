@@ -1,10 +1,14 @@
 sudo mount bpffs -t bpf /sys/fs/bpf
 
 export MASTER_IP=$(ip a |grep global | grep -v '10.0.2.15' | awk '{print $2}' | cut -f1 -d '/')
+export ETCD_IP=$(cat "/vagrant/local/etcd-ip")
 
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none \
 --no-flannel --node-ip=${MASTER_IP} --node-external-ip=${MASTER_IP} \
---bind-address=${MASTER_IP} --disable servicelb" sh - # --disable traefik
+--bind-address=${MASTER_IP} --disable servicelb" sh - 
+
+# --datastore-endpoint="http://${ETCD_IP}:2379"
+# --disable traefik
 
 echo $MASTER_IP > "/vagrant/local/master-ip"
 sudo cp /var/lib/rancher/k3s/server/node-token "/vagrant/local/node-token"
