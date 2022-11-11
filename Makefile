@@ -3,7 +3,8 @@
 
 # make cluster
 cluster:
-	vagrant up
+	vagrant up etcd0
+	
 
 destroy:
 	vagrant destroy -f
