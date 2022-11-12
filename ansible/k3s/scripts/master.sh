@@ -5,9 +5,8 @@ export ETCD_IP=$(cat "/vagrant/local/etcd-ip")
 
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none \
 --no-flannel --node-ip=${MASTER_IP} --node-external-ip=${MASTER_IP} \
---bind-address=${MASTER_IP} --disable servicelb" sh - 
+--bind-address=${MASTER_IP} --disable servicelb --datastore-endpoint=http://${ETCD_IP}:2379" sh - 
 
-# --datastore-endpoint="http://${ETCD_IP}:2379"
 # --disable traefik
 
 echo $MASTER_IP > "/vagrant/local/master-ip"

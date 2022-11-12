@@ -1,11 +1,116 @@
----
-- name: Configure etcd
-  become: yes
+- hosts: Install & Configure Etcd
+  become: True
   hosts: all
   tasks:
     # - name: Display all variables/facts known for a host
     #   ansible.builtin.debug:
     #     var: hostvars
+
+    - name: "Create directory for etcd binaries"
+      file:
+        path: /opt/etcd/bin
+        state: directory
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: "Download the tarball into the /tmp directory"
+      get_url:
+        url: https://storage.googleapis.com/etcd/v3.3.13/etcd-v3.3.13-linux-amd64.tar.gz
+        dest: /tmp/etcd.tar.gz
+        owner: root
+        group: root
+        mode: 0600
+        force: True
+
+    - name: "Extract the contents of the tarball"
+      unarchive:
+        src: /tmp/etcd.tar.gz
+        dest: /opt/etcd/bin/
+        owner: root
+        group: root
+        mode: 0600
+        extra_opts:
+          - --strip-components=1
+        decrypt: True
+        remote_src: True
+
+    - name: "Set permissions for etcd"
+      file:
+        path: /opt/etcd/bin/etcd
+        state: file
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: "Set permissions for etcdctl"
+      file:
+        path: /opt/etcd/bin/etcdctl
+        state: file
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: "Add /opt/etcd/bin/ to the $PATH environment variable"
+      lineinfile:
+        path: /etc/profile
+        line: export PATH="$PATH:/opt/etcd/bin"
+        state: present
+        create: True
+        insertafter: EOF
+
+    - name: "Set the ETCDCTL_API environment variable to 3"
+      lineinfile:
+        path: /etc/profile
+        line: export ETCDCTL_API=3
+        state: present
+        create: True
+        insertafter: EOF
+
+    - name: "Create a etcd service"
+      copy:
+        src: files/etcd.service
+        remote_src: False
+        dest: /etc/systemd/system/etcd.service
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "Stop the etcd service"
+      command: systemctl stop etcd
+
+    - name: "Create a data directory"
+      file:
+        path: /var/lib/etcd/{{ inventory_hostname }}.etcd
+        state: "{{ item }}"
+        owner: root
+        group: root
+        mode: 0755
+      with_items:
+        - absent
+        - directory
+
+    - name: "Create directory for etcd configuration"
+      file:
+        path: /etc/etcd
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: "Create configuration file for etcd"
+      template:
+        src: templates/etcd.conf.yaml.j2
+        dest: /etc/etcd/etcd.conf.yaml
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: "Enable the etcd service"
+      command: systemctl enable etcd
+
+    - name: "Start the etcd service"
+      command: systemctl restart etcd
 
     - name: Copying scripts to remote
       become: true 
@@ -14,22 +119,6 @@
         dest: /home/vagrant/
         mode: 0550
 
-    - name: Ensure that etcd is present
-      yum:
-        name: etcd
-        state: present
-
-    - name: Ensure that etcd is properly configured
-      template:
-        src: etcd.conf
-        dest: /etc/etcd/etcd.conf
-
-    - name: Ensure etcd is running
-      service:
-        name: etcd
-        state: started
-        enabled: True
-
     - name: Run etcd.sh
       shell:
-         "./scripts/etcd.sh {% for host in groups['all'] %}{{ hostvars[host]['ansible_eth1']['ipv4']['address'] }} {% endfor %}"
+         "./scripts/etcd.sh"

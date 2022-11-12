@@ -20,6 +20,8 @@ TODO:
 - Start k3s with external etcd (or [SQL db?](https://learnk8s.io/etcd-kubernetes#:~:text=of%20watch%20queries.-,Replacing%20etcd,-etcd%20works%20terrifically)) with mutual TLS
 - Add multiple master nodes support
 
+- Fix etcd cluster static discovery
+- Replace vagrant with Terraform
 
 ### Setup
 ```

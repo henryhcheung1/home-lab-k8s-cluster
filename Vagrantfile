@@ -12,24 +12,24 @@ Vagrant.configure("2") do |config|
     number_of_etcd = 1
     (0..number_of_etcd-1).each do |machine_id|
       config.vm.define "etcd#{machine_id}" do |machine|
-        machine.vm.box = "centos/7"
+        machine.vm.box = "#{box_name}"
         # machine.vbguest.installer_options = { allow_kernel_upgrade: true }
         machine.vm.hostname = "agent#{machine_id}"
 
         ip = machine_id
         machine.vm.hostname = "etcd#{machine_id}"
-        machine.vm.network :private_network, ip: "192.168.56.#{ip}"
+        machine.vm.network :private_network, ip: "192.168.56.#{ip}", virtualbox__intnet: true
 
         machine.vm.provider :virtualbox do |vbox|
           vbox.customize ["modifyvm", :id, "--memory", 1024]
           vbox.customize ["modifyvm", :id, "--cpus", 1]
         end
 
-        if machine_id == number_of_etcd-1
-          machine.vm.provision :ansible do |ansible|
-              ansible.playbook = "ansible/etcd/etcd-setup.yaml"
-          end
+        # if machine_id == number_of_etcd-1
+        machine.vm.provision :ansible do |ansible|
+            ansible.playbook = "ansible/etcd/etcd-setup.yaml"
         end
+        # end
       end
     end
 
@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "master" do |master|
     master.vm.box = "#{box_name}"
     master.vm.hostname = 'master'
-    master.vm.network :private_network, ip: "192.168.56.10", :netmask => "255.255.255.0"
+    master.vm.network :private_network, ip: "192.168.56.10", :netmask => "255.255.255.0", virtualbox__intnet: true
     master.vm.provider :virtualbox do |vbox|
         vbox.customize ["modifyvm", :id, "--memory", 1024]
         vbox.customize ["modifyvm", :id, "--cpus", 1]
@@ -48,23 +48,23 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  (0..number_of_agents-1).each do |node_number|
-    config.vm.define "agent#{node_number}" do |agent|
-      agent.vm.box = "#{box_name}"
-      agent.vm.hostname = "agent#{node_number}"
-      ip = node_number + 100
-      agent.vm.network :private_network, ip: "192.168.56.#{ip}", :netmask => "255.255.255.0"
-      agent.vm.provider :virtualbox do |vbox|
-          vbox.customize ["modifyvm", :id, "--memory", 1024]
-          vbox.customize ["modifyvm", :id, "--cpus", 1]
-      end
-      agent.vm.provision "ansible" do |ansible|
-        ansible.playbook = "ansible/k3s/agent-setup.yaml"
-      end
-    end
-  end
+  # (0..number_of_agents-1).each do |node_number|
+  #   config.vm.define "agent#{node_number}" do |agent|
+  #     agent.vm.box = "#{box_name}"
+  #     agent.vm.hostname = "agent#{node_number}"
+  #     ip = node_number + 100
+  #     agent.vm.network :private_network, ip: "192.168.56.#{ip}", :netmask => "255.255.255.0", virtualbox__intnet: true
+  #     agent.vm.provider :virtualbox do |vbox|
+  #         vbox.customize ["modifyvm", :id, "--memory", 1024]
+  #         vbox.customize ["modifyvm", :id, "--cpus", 1]
+  #     end
+  #     agent.vm.provision "ansible" do |ansible|
+  #       ansible.playbook = "ansible/k3s/agent-setup.yaml"
+  #     end
+  #   end
+  # end
 
-
+  
   # TODO: load balancer for multi-master setup
 
 end

@@ -1,10 +1,10 @@
 
 # makefile targets
 
-# make cluster
+# bring up VMs separately due to SSH timeout error when running 'vagrant up' to bring up all VMs simultaneously
 cluster:
 	vagrant up etcd0
-	
+	vagrant up master
 
 destroy:
 	vagrant destroy -f
