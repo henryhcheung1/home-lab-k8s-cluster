@@ -5,6 +5,7 @@
 cluster:
 	vagrant up etcd0
 	vagrant up master
+# vagrant up agent
 
 destroy:
 	vagrant destroy -f

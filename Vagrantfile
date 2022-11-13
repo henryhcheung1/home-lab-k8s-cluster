@@ -47,20 +47,20 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  # (0..number_of_agents-1).each do |node_number|
-  #   config.vm.define "agent#{node_number}" do |agent|
-  #     agent.vm.box = "#{box_name}"
-  #     agent.vm.hostname = "agent#{node_number}"
-  #     agent.vm.network "public_network", bridge: "wlo1"
-  #     agent.vm.provider :virtualbox do |vbox|
-  #         vbox.customize ["modifyvm", :id, "--memory", 1024]
-  #         vbox.customize ["modifyvm", :id, "--cpus", 1]
-  #     end
-  #     agent.vm.provision "ansible" do |ansible|
-  #       ansible.playbook = "ansible/k3s/agent-setup.yaml"
-  #     end
-  #   end
-  # end
+  (0..number_of_agents-1).each do |node_number|
+    config.vm.define "agent#{node_number}" do |agent|
+      agent.vm.box = "#{box_name}"
+      agent.vm.hostname = "agent#{node_number}"
+      agent.vm.network "public_network", bridge: "wlo1"
+      agent.vm.provider :virtualbox do |vbox|
+          vbox.customize ["modifyvm", :id, "--memory", 1024]
+          vbox.customize ["modifyvm", :id, "--cpus", 1]
+      end
+      agent.vm.provision "ansible" do |ansible|
+        ansible.playbook = "ansible/k3s/agent-setup.yaml"
+      end
+    end
+  end
 
   
   # TODO: load balancer for multi-master setup
