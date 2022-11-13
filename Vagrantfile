@@ -8,8 +8,6 @@ number_of_agents = (ENV['K3S_AGENTS'] || "1").to_i
 box_name = (ENV['VAGRANT_BOX'] || "ubuntu/focal64")
 Vagrant.configure("2") do |config|
 
-  # config.vm.network :bridged
-
     # etcd
     number_of_etcd = 1
     (0..number_of_etcd-1).each do |machine_id|
