@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: yes
+  # vars_files:
+  #   - vars.yaml
+  tasks:
+    - name: Copying scripts to remote
+      become: true 
+      copy:
+        src: scripts
+        dest: /home/vagrant/
+        mode: 0550
+
+    - name: Run agent.sh
+      shell:
+         "./scripts/agent.sh"

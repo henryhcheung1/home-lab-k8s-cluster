@@ -5,6 +5,7 @@
 #number of agent nodes by passing an enviornment variable for K3S_AGENTS
 
 number_of_agents = (ENV['K3S_AGENTS'] || "1").to_i
+number_of_storage_agents = (ENV['K3S_STORAGE'] || "1").to_i
 box_name = (ENV['VAGRANT_BOX'] || "ubuntu/focal64")
 Vagrant.configure("2") do |config|
 
@@ -45,6 +46,7 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  # agents
   (0..number_of_agents-1).each do |node_number|
     config.vm.define "agent#{node_number}" do |agent|
       agent.vm.box = "#{box_name}"
@@ -55,6 +57,23 @@ Vagrant.configure("2") do |config|
           vbox.customize ["modifyvm", :id, "--cpus", 1]
       end
       agent.vm.provision "ansible" do |ansible|
+        ansible.playbook = "ansible/k3s/agent-setup.yaml"
+      end
+    end
+  end
+
+  # storage agents
+  (0..number_of_storage_agents-1).each do |storage_number|
+    config.vm.define "storage#{storage_number}" do |storage|
+    config.vm.synced_folder "/mnt/sda#{storage_number+1}", "/mnt/sda#{storage_number+1}", type: "virtualbox"
+    storage.vm.box = "#{box_name}"
+      storage.vm.hostname = "storage#{storage_number}"
+      storage.vm.network "public_network", bridge: "wlo1"
+      storage.vm.provider :virtualbox do |vbox|
+          vbox.customize ["modifyvm", :id, "--memory", 1024]
+          vbox.customize ["modifyvm", :id, "--cpus", 1]
+      end
+      storage.vm.provision "ansible" do |ansible|
         ansible.playbook = "ansible/k3s/agent-setup.yaml"
       end
     end

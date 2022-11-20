@@ -5,14 +5,15 @@
 cluster:
 	vagrant up etcd0
 	vagrant up master
-# vagrant up agent
+	vagrant up agent
 
 destroy:
 	vagrant destroy -f
 	rm local/*
 
 kubeconfig:
-	export KUBECONFIG=local/k3s.yaml
+# export KUBECONFIG=local/k3s.yaml
+	cat local/k3s.yaml > ~/.kube/config
 
 provision:
 	vagrant provision

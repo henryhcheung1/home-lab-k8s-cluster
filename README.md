@@ -8,9 +8,10 @@ Cluster Components:
 - Traefik ingress controller (or Envoy Contour)
 - Cilium CNI
 - Flatcar Linux
-- CSI (Rook + Ceph?, Longhorn)
+- CSI (Rook + Ceph) - require NTP
 - Open Policy Agent (OPA)
 - Service mesh (Istio?)
+- ArgoCD
 
 
 DONE:
