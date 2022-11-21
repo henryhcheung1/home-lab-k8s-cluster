@@ -5,7 +5,10 @@
 cluster:
 	vagrant up etcd0
 	vagrant up master
-	vagrant up agent
+# vagrant up agent
+
+storage:
+	vagrant up storage0
 
 destroy:
 	vagrant destroy -f

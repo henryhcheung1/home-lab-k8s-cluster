@@ -14,7 +14,6 @@ Vagrant.configure("2") do |config|
     (0..number_of_etcd-1).each do |machine_id|
       config.vm.define "etcd#{machine_id}" do |machine|
         machine.vm.box = "#{box_name}"
-        # machine.vbguest.installer_options = { allow_kernel_upgrade: true }
         machine.vm.hostname = "etcd#{machine_id}"
         machine.vm.network "public_network", bridge: "wlo1"
 
@@ -63,10 +62,11 @@ Vagrant.configure("2") do |config|
   end
 
   # storage agents
+  # requirement: create partitions first names sda<num> (i.e. /dev/sda1, /dev/sda2, ...)
   (0..number_of_storage_agents-1).each do |storage_number|
     config.vm.define "storage#{storage_number}" do |storage|
-    config.vm.synced_folder "/mnt/sda#{storage_number+1}", "/mnt/sda#{storage_number+1}", type: "virtualbox"
-    storage.vm.box = "#{box_name}"
+      storage.vm.synced_folder "/mnt/sda#{storage_number+1}", "/mnt/sda#{storage_number+1}", type: "virtualbox"
+      storage.vm.box = "#{box_name}"
       storage.vm.hostname = "storage#{storage_number}"
       storage.vm.network "public_network", bridge: "wlo1"
       storage.vm.provider :virtualbox do |vbox|
@@ -74,11 +74,10 @@ Vagrant.configure("2") do |config|
           vbox.customize ["modifyvm", :id, "--cpus", 1]
       end
       storage.vm.provision "ansible" do |ansible|
-        ansible.playbook = "ansible/k3s/agent-setup.yaml"
+        ansible.playbook = "ansible/k3s/storage-setup.yaml"
       end
     end
   end
-
   
   # TODO: load balancer for multi-master setup
 

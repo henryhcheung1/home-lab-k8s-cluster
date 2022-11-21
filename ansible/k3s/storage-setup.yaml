@@ -11,6 +11,6 @@
         dest: /home/vagrant/
         mode: 0550
 
-    - name: Run agent.sh
+    - name: Run storage.sh
       shell:
-         "./scripts/agent.sh"
+         "./scripts/storage.sh"
