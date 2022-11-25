@@ -7,14 +7,14 @@
     - name: Copying scripts to remote
       become: true 
       copy:
-        src: scripts
+        src: scripts/master
         dest: /home/vagrant/
         mode: 0550
 
     - name: Run master.sh
       shell:
-         "./scripts/master.sh"
+         "./master/install.sh"
 
-    - name: Run install-cilium.sh
+    - name: Install Cilium
       shell:
-         "./scripts/install-cilium.sh"
+         "./master/cilium.sh"

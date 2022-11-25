@@ -11,8 +11,7 @@ Cluster Components:
 - CSI (Rook + Ceph) - require NTP
 - Open Policy Agent (OPA)
 - Service mesh (Istio?)
-- ArgoCD
-
+- ArgoCD (Kustomization + jsonnet/ksonnet)
 
 DONE:
 - Add Cilium CNI
@@ -27,11 +26,25 @@ TODO:
 - Fix etcd cluster static discovery for multi etcd cluster (issue with Ansible)
 - Add mutual TLS between external multi etcd k3s (or [SQL db?](https://learnk8s.io/etcd-kubernetes#:~:text=of%20watch%20queries.-,Replacing%20etcd,-etcd%20works%20terrifically)) 
 - Add add server / agent node makefile target
+- Chaos engineering testing
 
-- Replace Vagrant with Terraform
 
 ### Setup
 ```
 mkdir local
 make cluster
+```
+
+
+### Boot Order
+```bash
+# VM
+etcd
+master (server)
+worker (agent)
+
+# K8s
+cilium
+metallb
+
 ```

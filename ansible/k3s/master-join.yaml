@@ -7,10 +7,10 @@
     - name: Copying scripts to remote
       become: true 
       copy:
-        src: scripts/agent
+        src: scripts/master
         dest: /home/vagrant/
         mode: 0550
 
-    - name: Run agent.sh
+    - name: Run master.sh
       shell:
-         "./agent/install.sh"
+         "./master/join.sh"

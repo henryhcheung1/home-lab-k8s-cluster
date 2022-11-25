@@ -9,6 +9,7 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none \
 --bind-address=${MASTER_IP} --disable servicelb --datastore-endpoint=http://${ETCD_IP}:2379" sh - 
 
 # --disable traefik
+# --node-taint CriticalAddonsOnly=true:NoExecute
 
 echo $MASTER_IP > "/vagrant/local/master-ip"
 sudo cp /var/lib/rancher/k3s/server/node-token "/vagrant/local/node-token"
