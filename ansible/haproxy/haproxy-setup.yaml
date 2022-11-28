@@ -1,5 +1,15 @@
 ---
 - hosts: all
   become: yes
+  tasks:
+    - name: Copying scripts to remote
+      become: true 
+      copy:
+        src: scripts
+        dest: /home/vagrant/
+        mode: 0550
+    - name: Run haproxy setup.sh
+      shell:
+         "./scripts/setup.sh"
   roles:
     - { role: geerlingguy.haproxy }

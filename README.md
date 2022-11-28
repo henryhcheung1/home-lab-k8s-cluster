@@ -49,3 +49,11 @@ cilium
 metallb
 
 ```
+
+
+
+etcd(s)
+master(s) - update haproxy config with k8s master IPs
+haproxy
+workers
+storage

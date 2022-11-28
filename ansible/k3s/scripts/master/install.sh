@@ -1,15 +1,18 @@
+#!/usr/bin/env bash
+
 sudo mount bpffs -t bpf /sys/fs/bpf
 
 # export MASTER_IP=$(ip a |grep global | grep -v '10.0.2.15' | awk '{print $2}' | cut -f1 -d '/')
 export MASTER_IP=$(ip -f inet addr show enp0s8 | sed -En -e 's/.*inet ([0-9.]+).*/\1/p')
 export ETCD_IP=$(cat "/vagrant/local/etcd-ip")
+export MASTER_HAPROXY_IP=$(cat "/vagrant/local/haproxy-ip")
 
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --flannel-backend=none \
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none \
 --no-flannel --node-ip=${MASTER_IP} --node-external-ip=${MASTER_IP} --bind-address=${MASTER_IP} \
---node-taint CriticalAddonsOnly=true:NoExecute --disable servicelb --datastore-endpoint=http://${ETCD_IP}:2379" sh - 
+--node-taint CriticalAddonsOnly=true:NoExecute --disable servicelb --tls-san ${MASTER_HAPROXY_IP} \
+--datastore-endpoint=http://${ETCD_IP}:2379" sh - 
 
 # --disable traefik
-# --node-taint CriticalAddonsOnly=true:NoExecute
 
 echo $MASTER_IP > "/vagrant/local/master-ip"
 sudo cp /var/lib/rancher/k3s/server/node-token "/vagrant/local/node-token"

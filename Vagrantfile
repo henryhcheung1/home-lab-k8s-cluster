@@ -1,8 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#The cluster will start with 2 agent nodes by default. You can tune the
-#number of agent nodes by passing an enviornment variable for K3S_AGENTS
+#TODO: sort static IPs based on deployment order 
 
 number_of_etcd = (ENV['K3S_ETCDS'] || "1").to_i
 number_of_servers = (ENV['K3S_SERVERS'] || "2").to_i
@@ -12,7 +11,7 @@ box_name = (ENV['VAGRANT_BOX'] || "ubuntu/bionic64")
 Vagrant.configure("2") do |config|
 
   # multi-master LB
-  config.vm.define "master_lb" do |haproxy|
+  config.vm.define "master_haproxy" do |haproxy|
     haproxy.vm.box = "#{box_name}"
     haproxy.vm.hostname = "haproxy"
     haproxy.vm.network "public_network", bridge: "wlo1", ip: "192.168.1.20"
