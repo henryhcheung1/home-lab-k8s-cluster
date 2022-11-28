@@ -27,6 +27,7 @@ TODO:
 - Add mutual TLS between external multi etcd k3s (or [SQL db?](https://learnk8s.io/etcd-kubernetes#:~:text=of%20watch%20queries.-,Replacing%20etcd,-etcd%20works%20terrifically)) 
 - Add add server / agent node makefile target
 - Chaos engineering testing
+- Cluster backups with Velero
 
 
 ### Setup

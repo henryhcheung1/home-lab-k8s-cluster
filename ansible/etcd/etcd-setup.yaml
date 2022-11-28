@@ -98,16 +98,6 @@
         group: root
         mode: 0755
 
-
-
-
-    - name: Display all variables/facts known for a host
-      ansible.builtin.debug:
-        var: hostvars
-
-
-
-
     - name: "Create configuration file for etcd"
       template:
         src: templates/etcd.conf.yaml.j2

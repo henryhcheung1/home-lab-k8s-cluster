@@ -8,36 +8,56 @@ number_of_etcd = (ENV['K3S_ETCDS'] || "1").to_i
 number_of_servers = (ENV['K3S_SERVERS'] || "2").to_i
 number_of_agents = (ENV['K3S_AGENTS'] || "1").to_i
 number_of_storages = (ENV['K3S_STORAGE'] || "1").to_i
-box_name = (ENV['VAGRANT_BOX'] || "ubuntu/focal64")
+box_name = (ENV['VAGRANT_BOX'] || "ubuntu/bionic64")
 Vagrant.configure("2") do |config|
 
-    # etcd
-    (0..number_of_etcd-1).each do |machine_id|
-      config.vm.define "etcd#{machine_id}" do |machine|
-        machine.vm.box = "#{box_name}"
-        machine.vm.hostname = "etcd#{machine_id}"
-        machine.vm.network "public_network", bridge: "wlo1"
+  # multi-master LB
+  config.vm.define "master_lb" do |haproxy|
+    haproxy.vm.box = "#{box_name}"
+    haproxy.vm.hostname = "haproxy"
+    haproxy.vm.network "public_network", bridge: "wlo1", ip: "192.168.1.20"
 
-        machine.vm.provider :virtualbox do |vbox|
-          vbox.customize ["modifyvm", :id, "--memory", 1024]
-          vbox.customize ["modifyvm", :id, "--cpus", 1]
-          # vbox.customize ["modifyvm", :id, "--cableconnected1", "on"]
-        end
-
-        # if machine_id == number_of_etcd-1
-        machine.vm.provision :ansible do |ansible|
-            ansible.playbook = "ansible/etcd/etcd-setup.yaml"
-        end
-        # end
-      end
+    haproxy.vm.provider :virtualbox do |vbox|
+      vbox.customize ["modifyvm", :id, "--memory", 1024]
+      vbox.customize ["modifyvm", :id, "--cpus", 1]
     end
+
+    haproxy.vm.provision :ansible do |ansible|
+      ansible.playbook = "ansible/haproxy/haproxy-setup.yaml"
+    end
+
+    # haproxy.vm.network "forwarded_port", guest: 6443, host: 6443
+    # haproxy.vm.provision "file", source: "scripts/haproxy/haproxy.cfg", destination: "/tmp/haproxy.cfg"
+    # haproxy.vm.provision "shell", privileged: true,  path: "scripts/haproxy/install_happroxy.sh"
+  end
+
+  # etcd
+  (0..number_of_etcd-1).each do |machine_id|
+    config.vm.define "etcd#{machine_id}" do |machine|
+      machine.vm.box = "#{box_name}"
+      machine.vm.hostname = "etcd#{machine_id}"
+      machine.vm.network "public_network", bridge: "wlo1", ip: "192.168.1.10#{machine_id}"
+
+      machine.vm.provider :virtualbox do |vbox|
+        vbox.customize ["modifyvm", :id, "--memory", 1024]
+        vbox.customize ["modifyvm", :id, "--cpus", 1]
+        # vbox.customize ["modifyvm", :id, "--cableconnected1", "on"]
+      end
+
+      # if machine_id == number_of_etcd-1
+      machine.vm.provision :ansible do |ansible|
+          ansible.playbook = "ansible/etcd/etcd-setup.yaml"
+      end
+      # end
+    end
+  end
 
   # master
   (0..number_of_servers-1).each do |server_id|
     config.vm.define "master#{server_id}" do |master|
       master.vm.box = "#{box_name}"
       master.vm.hostname = "master#{server_id}"
-      master.vm.network "public_network", bridge: "wlo1"
+      master.vm.network "public_network", bridge: "wlo1", ip: "192.168.1.11#{server_id}"
       master.vm.provider :virtualbox do |vbox|
           vbox.customize ["modifyvm", :id, "--memory", 1024]
           vbox.customize ["modifyvm", :id, "--cpus", 1]
@@ -61,7 +81,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "agent#{node_number}" do |agent|
       agent.vm.box = "#{box_name}"
       agent.vm.hostname = "agent#{node_number}"
-      agent.vm.network "public_network", bridge: "wlo1"
+      agent.vm.network "public_network", bridge: "wlo1", ip: "192.168.1.12#{node_number}"
       agent.vm.provider :virtualbox do |vbox|
           vbox.customize ["modifyvm", :id, "--memory", 1024]
           vbox.customize ["modifyvm", :id, "--cpus", 1]
@@ -80,7 +100,7 @@ Vagrant.configure("2") do |config|
       storage.vm.synced_folder "/mnt/sda#{storage_number+1}", "/mnt/sda#{storage_number+1}", type: "virtualbox"
       storage.vm.box = "#{box_name}"
       storage.vm.hostname = "storage#{storage_number}"
-      storage.vm.network "public_network", bridge: "wlo1"
+      storage.vm.network "public_network", bridge: "wlo1", ip: "192.168.1.13#{storage_number}"
       storage.vm.provider :virtualbox do |vbox|
           vbox.customize ["modifyvm", :id, "--memory", 1024]
           vbox.customize ["modifyvm", :id, "--cpus", 1]

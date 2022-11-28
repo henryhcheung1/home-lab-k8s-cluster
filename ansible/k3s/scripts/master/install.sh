@@ -4,9 +4,9 @@ sudo mount bpffs -t bpf /sys/fs/bpf
 export MASTER_IP=$(ip -f inet addr show enp0s8 | sed -En -e 's/.*inet ([0-9.]+).*/\1/p')
 export ETCD_IP=$(cat "/vagrant/local/etcd-ip")
 
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-backend=none \
---no-flannel --node-ip=${MASTER_IP} --node-external-ip=${MASTER_IP} \
---bind-address=${MASTER_IP} --disable servicelb --datastore-endpoint=http://${ETCD_IP}:2379" sh - 
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --flannel-backend=none \
+--no-flannel --node-ip=${MASTER_IP} --node-external-ip=${MASTER_IP} --bind-address=${MASTER_IP} \
+--node-taint CriticalAddonsOnly=true:NoExecute --disable servicelb --datastore-endpoint=http://${ETCD_IP}:2379" sh - 
 
 # --disable traefik
 # --node-taint CriticalAddonsOnly=true:NoExecute
